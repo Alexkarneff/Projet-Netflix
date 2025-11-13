@@ -3,7 +3,7 @@ import json
 infos_utilisateur = {
     "nom": "à saisir ?",
     "nb_connexion": 0, # à incrémenter de 1 à chaque lancement
-    "recherches_frequentes" : {[]} # liste ou dictionnaire regroupant les recherches 
+    "recherches_frequentes" : {} # liste ou dictionnaire regroupant les recherches 
     }
 
 """
