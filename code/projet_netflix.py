@@ -47,7 +47,7 @@ def recherche_genre(dataset = movies_dataset):
         try:
             genre_saisi = input("Saisir un genre : ")
             genre_saisi = genre_saisi[0].upper() + genre_saisi[1:].lower()
-            new_dataset = dataset[dataset['genres_names'].str.contains(genre_saisi, na=False)]
+            new_dataset = dataset[dataset['genres'].str.contains(genre_saisi, na=False)]
             new_dataset = new_dataset.sort_values("popularity", ascending=False)
             break
         except ValueError:
@@ -64,7 +64,7 @@ def recherche_acteur(dataset = movies_dataset):
     while True:
         try:
             acteur_saisi = input("Nom de l'acteur : ")
-            new_dataset = dataset[dataset['cast_names'].str.contains(acteur_saisi, na=False)]
+            new_dataset = dataset[dataset['cast'].str.contains(acteur_saisi, na=False)]
             new_dataset = new_dataset.sort_values("popularity", ascending=False)
             break
         except ValueError:
@@ -81,7 +81,7 @@ def recherche_pays(dataset = movies_dataset):
     while True:
         try:
             pays_saisi = input("Nom du pays : ")
-            new_dataset = dataset[dataset['countries_names'].str.contains(pays_saisi, na=False)]
+            new_dataset = dataset[dataset['original_countries'].str.contains(pays_saisi, na=False)]
             new_dataset = new_dataset.sort_values("popularity", ascending=False)
             break
         except ValueError:
