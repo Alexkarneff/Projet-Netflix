@@ -1,6 +1,5 @@
 from modules import utilisateur
 
-
 def afficher_menu_principal():
     # Affiche le menu principal.
     print("\n=== MOTEUR DE RECHERCHE NETFLIX ===")
@@ -16,6 +15,7 @@ def main() :
         print("Bienvenue sur le moteur de recherche Netflix !")
         # users = utilisateur.load_users()    #charge tous les utilisateurs enregistrés
         username = input("Entrez votre nom d'utilisateur : ").strip()
+        print (username)
         # current_user = utilisateur.create_user(users, username)      #crée un utilisateur si inexistant, reconnaît un utilisateur existant autrement
         while True:
             afficher_menu_principal()
@@ -61,5 +61,5 @@ def main() :
                         print("Choix invalide. Veuillez entrer un chiffre de 1 à 5.")                   # gère les choix qui ne sont pas de 1 à 5
                         break
                   
-
-main()
+if __name__ == "__main__":
+    main()

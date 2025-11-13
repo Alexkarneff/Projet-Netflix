@@ -15,7 +15,7 @@ class User:                             # La Classe qui représente un utilisate
         self.average_duration = []    # liste des durées des films recherchés
 
 
-    # def to_dict(self):                  Convertit l'objet utilisateur en dictionnaire pour l'enregistrement JSON.
+    def to_dict(self):                  # Convertit l'objet utilisateur en dictionnaire pour l'enregistrement JSON.
 
         return {
             "username": self.username,
