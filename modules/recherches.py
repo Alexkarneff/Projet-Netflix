@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-movies_dataset = pd.read_csv("data/dataset/movies_metadata_credits_joined2.csv", sep = ",")
+movies_dataset = pd.read_csv("data/dataset/movies_metadata_credits_joined 2.csv", sep = ",")
 
 
 # Fonction de recherche par durée : retourne un dataset contenant uniquement les films ayant exactement la bonne durée

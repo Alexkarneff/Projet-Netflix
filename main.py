@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-movies_dataset = pd.read_csv("data/dataset/movies_metadata_credits_joined2.csv", sep = ",")
+movies_dataset = pd.read_csv("data/dataset/movies_metadata_credits_joined 2.csv", sep = ",")
 
 from modules import utilisateur
 from modules import filtres
@@ -11,7 +11,7 @@ def afficher_menu_principal():
     # Affiche le menu principal.
     print("\n=== MOTEUR DE RECHERCHE NETFLIX ===")
     print("1. Menu des genres")
-    print("2. Faire une recherche (simulation)")
+    print("2. Faire une recherche")
     print("3. Noter un film")
     # print("4. Voir mes statistiques")
     print("4. Supprimer mes données")
@@ -29,10 +29,10 @@ def main() :
             afficher_menu_principal()
             choix = input("Choisissez une option : ").strip()
             match choix:              
-                case "1":                                           #choix 2 Filtrer les films
+                case "1":                                           #choix 1 Filtrer les films
                        filtres.programme_filtre()
 
-                case "2":                                           #choix 1 Rechercher un film
+                case "2":                                           #choix 2 Rechercher un film
                         print("\n--- Nouvelle recherche ---")
                         genre = input("Entrez un genre (ex: Action, Comédie, Horreur) : ")
                         country = input("Entrez un pays (ex: USA, France, UK) : ")
@@ -46,13 +46,17 @@ def main() :
                 case "3":                                           #choix 3 Noter un film
                         print("\n--- Noter un film ---")
                         title = input("Titre du film : ")
-                        try:
-                            rating = int(input("Note (1 à 5) : "))
-                        except ValueError:
-                            print("Veuillez entrer un nombre entre 1 et 5.")
+                        if title in movies_dataset["original_title"].values :
+                            try:
+                                rating = int(input("Note (1 à 5) : "))
+                            except ValueError:
+                                print("Veuillez entrer un nombre entre 1 et 5.")
+                            utilisateur.rate_movie(current_user, title, rating)           #enregistre la note de l'utilisateur pour le film
+                            utilisateur.save_users(users)                                 #enregistre les changements utilisateur
                             continue
-                        utilisateur.rate_movie(current_user, title, rating)           #enregistre la note de l'utilisateur pour le film
-                        utilisateur.save_users(users)            #enregistre les changements utilisateur
+                        else :
+                              print("Film Introuvable")
+
 
                 # case "4":                                           # choix 4 Montre les stats de l'utilisateur connecté
                 #         print("MES STATS :")

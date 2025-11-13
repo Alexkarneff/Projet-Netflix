@@ -8,8 +8,10 @@
                 "duration": 120
             }
         ],
-        "ratings": {},
-        "connections": 14,
+        "ratings": {
+            "Toy Story": 5
+        },
+        "connections": 20,
         "favorite_genres": {
             "Action": 1
         },
@@ -19,14 +21,5 @@
         "average_duration": [
             120
         ]
-    },
-    "0": {
-        "username": "0",
-        "search_history": [],
-        "ratings": {},
-        "connections": 1,
-        "favorite_genres": {},
-        "favorite_country": {},
-        "average_duration": []
     }
 }
