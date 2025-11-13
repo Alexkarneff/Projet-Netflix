@@ -59,7 +59,7 @@ def recherche_genre(dataset = movies_dataset):
 # print(new_dataset["original_title"].head())
 
 
-# Recherche par acteur (obliger d'écrire le nom avec les bonnes majuscules et minuscules
+# Recherche par acteur (obliger d'écrire le nom avec les bonnes majuscules et minuscules)
 def recherche_acteur(dataset = movies_dataset):
     while True:
         try:
