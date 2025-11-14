@@ -6,6 +6,7 @@ movies_dataset = pd.read_csv("data/dataset/movies_metadata_credits_joined 2.csv"
 from modules import utilisateur
 from modules import filtres
 from modules import stats
+from modules import recherches
 
 def afficher_menu_principal():
     # Affiche le menu principal.
@@ -13,9 +14,12 @@ def afficher_menu_principal():
     print("1. Menu des genres")
     print("2. Faire une recherche")
     print("3. Noter un film")
-    # print("4. Voir mes statistiques")
-    print("4. Supprimer mes données")
-    print("5. Quitter")
+    print("4. Voir mes statistiques")
+    print("5. Supprimer mes données")
+    print("Q. Quitter")
+
+
+
 
 
 def main() :
@@ -33,16 +37,9 @@ def main() :
                        filtres.programme_filtre()
 
                 case "2":                                           #choix 2 Rechercher un film
-                        print("\n--- Nouvelle recherche ---")
-                        genre = input("Entrez un genre (ex: Action, Comédie, Horreur) : ")
-                        country = input("Entrez un pays (ex: USA, France, UK) : ")
-                        try:
-                            duration = int(input("Durée souhaitée (en minutes) : "))
-                        except ValueError:
-                            duration = None
-                        utilisateur.search_record(current_user, genre=genre, country=country, duration=duration)    # enregistre la recherche de l'utilisateur
-                        print(f"🔍 Recherche enregistrée : {genre}, {country}, {duration} min")
-                        utilisateur.save_users(users)            #enregistre les changements utilisateur
+                        recherches.menu_recherches(movies_dataset, current_user)
+                        utilisateur.save_users(users)  # Sauvegarder l'historique après la recherche
+
                 case "3":                                           #choix 3 Noter un film
                         print("\n--- Noter un film ---")
                         title = input("Titre du film : ")
@@ -57,12 +54,10 @@ def main() :
                         else :
                               print("Film Introuvable")
 
-
-                # case "4":                                           # choix 4 Montre les stats de l'utilisateur connecté
-                #         print("MES STATS :")
-                #         utilisateur.show_user_stats(current_user)   
+                case "4":                                           # choix 4 Afficher l'historique de recherche
+                        utilisateur.afficher_statistique(current_user)
         
-                case "4":                                           # choix 5 Supprimer l'utilisateur connecté après confirmation
+                case "5":                                           # choix 5 Supprimer l'utilisateur connecté après confirmation
                         confirmation = input("Êtes-vous sûr de vouloir supprimer vos données ? (oui/non) : ")               
                         if confirmation.lower() == "oui":       
                             utilisateur.delete_user(users,username)
@@ -71,12 +66,12 @@ def main() :
                         else:
                             print("Suppression annulée.")
 
-                case "5":                                                                   # choix 6 Déconnexion de l'utilisateur
+                case "Q" | "q":                                                                   # choix 6 Déconnexion de l'utilisateur
                         print("Merci d'avoir utilisé le moteur Netflix. À bientôt !")                           
                         break
                  
                 case _:
-                        print("Choix invalide. Veuillez entrer un chiffre de 1 à 5.")                   # gère les choix qui ne sont pas de 1 à 5
+                        print("Choix invalide. Veuillez entrer un chiffre de 1 à 6.")                   # gère les choix qui ne sont pas de 1 à 6
                         continue
                   
 if __name__ == "__main__":
