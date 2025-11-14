@@ -1,0 +1,38 @@
+{
+    "Alex": {
+        "username": "Alex",
+        "search_history": [
+            {
+                "genre": "Action",
+                "acteur": null,
+                "langue": "eb",
+                "duree": null
+            },
+            {
+                "genre": "Drama",
+                "acteur": null,
+                "langue": "en",
+                "duree": null
+            },
+            {
+                "genre": "Comedy",
+                "acteur": null,
+                "langue": "it",
+                "duree": null
+            }
+        ],
+        "ratings": {},
+        "connections": 3,
+        "favorite_genres": {
+            "Action": 1,
+            "Drama": 1,
+            "Comedy": 1
+        },
+        "favorite_language": {
+            "eb": 1,
+            "en": 1,
+            "it": 1
+        },
+        "average_duration": []
+    }
+}
