@@ -55,7 +55,7 @@ def main() :
                               print("Film Introuvable")
 
                 case "4":                                           # choix 4 Afficher l'historique de recherche
-                        utilisateur.afficher_statistique(current_user)
+                        utilisateur.user_statistics(current_user)
         
                 case "5":                                           # choix 5 Supprimer l'utilisateur connecté après confirmation
                         confirmation = input("Êtes-vous sûr de vouloir supprimer vos données ? (oui/non) : ")               
