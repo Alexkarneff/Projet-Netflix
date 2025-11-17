@@ -15,30 +15,29 @@ with open("data/dataset/movies_metadata_credits_joined 2.csv", "r", encoding="ut
         duree = film.get("runtime", "").strip()
         genres_str = film.get("genres", "")
 
-        # Tenter de convertir le champ genres en liste Python
-        try:
-            genres_data = ast.literal_eval(genres_str) if genres_str else []
-        except (ValueError, SyntaxError):
-            genres_data = []
+        genres_list =[]
+        if genres_str:
+        # Séparer par les virgules et nettoyer chaque genre
+            genres_list = [g.strip() for g in genres_str.split(",") if g.strip()]
 
-        genres_list = []
-
-        # Extraire les noms de genres selon le format
-        if isinstance(genres_data, list):
-            for g in genres_data:
-                if isinstance(g, dict) and "name" in g:
-                    genres_list.append(g["name"])
-                elif isinstance(g, str):
-                    genres_list.append(g.strip())
 
         # Enregistrer chaque film avec son genre
-        for genre in genres_list:
-            films_data.append({
-                "titre": titre,
-                "genre": genre,
-                "langue": langue,
-                "duree": duree
-            })
+        if genres_list:
+            for genre in genres_list:
+                films_data.append({
+                    "titre": titre,
+                    "genre": genre,
+                    "langue": langue,
+                    "duree": duree
+                })
+            else:
+                # Film sans genre
+                films_data.append({
+                    "titre": titre,
+                    "genre": "Unknown",
+                    "langue": langue,
+                    "duree": duree
+                })
 
 df = pd.DataFrame(films_data)
 
