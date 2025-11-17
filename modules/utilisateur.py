@@ -78,7 +78,6 @@ def search_record(user, genre=None, language=None, duration=None):              
         user.average_duration.append(duration)
 
 def rate_movie(user, title, rating):                        # Permet à l'utilisateur de noter un film.
-    
     if 1 <= rating <= 5:
         user.ratings[title] = rating
         print(f"Vous avez noté {title} : {rating}/5")
@@ -86,7 +85,7 @@ def rate_movie(user, title, rating):                        # Permet à l'utilis
         print("La note doit être comprise entre 1 et 5.")
 
 
-def afficher_statistique(user):                      # Affiche les statistiques de l'utilisateur
+def user_statistics(user):                      # Affiche les statistiques de l'utilisateur
   
     if not user.search_history:
         if user.connections :
@@ -97,8 +96,7 @@ def afficher_statistique(user):                      # Affiche les statistiques 
     
     print(f"\n Nombre total de recherches : {len(user.search_history)}\n")
     
-    
-    # Statistiques
+
     if user.favorite_genres:
         print("\n Genre les plus recherchés :")
         genres_tries = sorted(user.favorite_genres.items(), key=lambda x: x[1], reverse=True)
