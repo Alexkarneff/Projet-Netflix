@@ -6,7 +6,7 @@ movies_dataset = pd.read_csv("data/dataset/movies_metadata_credits_joined 2.csv"
 from modules import utilisateur
 from modules import filtres
 from modules import stats
-from modules import recherches
+from modules import recherches2
 
 def afficher_menu_principal():
     # Affiche le menu principal.
@@ -16,18 +16,15 @@ def afficher_menu_principal():
     print("3. Noter un film")
     print("4. Voir mes statistiques")
     print("5. Supprimer mes données")
-    print("Q. Quitter")
-
-
-
+    print("q. Quitter")
 
 
 def main() :
-        print("Bienvenue sur le moteur de recherche Netflix !")
+        print("\nBienvenue sur le moteur de recherche Netflix !")
+        print("\n--- Statistiques Globales ---")
         stats.stats_globales(movies_dataset)
         users = utilisateur.load_users()    #charge tous les utilisateurs enregistrés
-        username = input("Entrez votre nom d'utilisateur : ").strip()
-        print (username)
+        username = input("\nEntrez votre nom d'utilisateur : ").strip()
         current_user = utilisateur.create_user(users, username)      #crée un utilisateur si inexistant, reconnaît un utilisateur existant autrement
         while True:
             afficher_menu_principal()
@@ -37,11 +34,11 @@ def main() :
                        filtres.programme_filtre()
 
                 case "2":                                           #choix 2 Rechercher un film
-                        recherches.menu_recherches(movies_dataset, current_user)
-                        utilisateur.save_users(users)  # Sauvegarder l'historique après la recherche
+                        recherches2.main()
+                        # utilisateur.save_users(users)  # Sauvegarder l'historique après la recherche
 
                 case "3":                                           #choix 3 Noter un film
-                        print("\n--- Noter un film ---")
+                        print("\n Noter un film ")
                         title = input("Titre du film : ")
                         if title in movies_dataset["original_title"].values :
                             try:
