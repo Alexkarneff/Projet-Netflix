@@ -27,6 +27,7 @@ def main() :
         users = utilisateur.load_users()    #charge tous les utilisateurs enregistrés
         username = input("\nEntrez votre nom d'utilisateur : ").strip()
         current_user = utilisateur.create_user(users, username)      #crée un utilisateur si inexistant, reconnaît un utilisateur existant autrement
+        
         while True:
             afficher_menu_principal()
             choix = input("Choisissez une option : ").strip()
@@ -63,6 +64,8 @@ def main() :
                             break
                         else:
                             print("Suppression annulée.")
+                case "admin":
+                        print("\n Menu Admin")
 
                 case "Q" | "q":                                                                   # choix 6 Déconnexion de l'utilisateur
                         print("Merci d'avoir utilisé le moteur Netflix. À bientôt !")                           
