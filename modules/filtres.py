@@ -71,7 +71,7 @@ def genre_filtre():
 
         choix_genre = input("Choisissez un genre valide : ").strip()
 
-        if choix_genre == "0":
+        if choix_genre == "0" | "q" | "Q" :
             return None  # quitter
 
         if choix_genre == "1":

@@ -279,7 +279,7 @@ def _afficher_filtre_colonly(df: pd.DataFrame, colonne_filtre: str, valeur: str,
         return
 
     col_affichee = only_print_col or col
-    _print_only_column(subset, col_affichee, label=label or col_affichee, limit=50)
+    _print_only_column(subset, col_affichee, label=label or col_affichee, limit=10)
 
 def _filtrer_par_duree(df: pd.DataFrame, min_min: int | None, max_min: int | None, title_col: str):
     """
@@ -310,7 +310,7 @@ def _filtrer_par_duree(df: pd.DataFrame, min_min: int | None, max_min: int | Non
         cols.append("release_date")
     cols.append("_duration_min")
 
-    to_show = subset.loc[:, cols].head(30)
+    to_show = subset.loc[:, cols].head(5)
     to_show = to_show.rename(columns={"_duration_min": "duration_min"})
     print(f"\n{C.BOLD}Films trouvés :{C.RESET}", flush=True)
     print(to_show.to_string(index=False), flush=True)
@@ -336,7 +336,7 @@ def _filtrer_par_annee(df: pd.DataFrame, year_str: str, title_col: str):
         cols.append("release_date")
     cols.append("_year")
 
-    to_show = subset.loc[:, cols].head(50).rename(columns={"_year": "year"})
+    to_show = subset.loc[:, cols].head(5).rename(columns={"_year": "year"})
     print(f"\n{C.BOLD}Films sortis en {year} :{C.RESET}", flush=True)
     print(to_show.to_string(index=False), flush=True)
 
@@ -390,7 +390,7 @@ def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
                     if "_genres" in subset.columns:
                         cols.append("_genres")
 
-                    to_show = subset.loc[:, cols].head(50).rename(
+                    to_show = subset.loc[:, cols].head(5).rename(
                         columns={title_col: "Titre", "_genres": "Genres"}
                     )
                     print(f"\n{C.BOLD}Films trouvés pour ce genre :{C.RESET}", flush=True)
