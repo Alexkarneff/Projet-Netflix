@@ -2,9 +2,8 @@ import csv
 import pandas as pd
 import ast  # pour interpréter les listes sous forme de texte
 
-# -----------------------------
 # 1 Lecture du fichier CSV
-# -----------------------------
+
 films_data = []
 
 with open("data/dataset/movies_metadata_credits_joined 2.csv", "r", encoding="utf-8") as f:
@@ -41,9 +40,9 @@ with open("data/dataset/movies_metadata_credits_joined 2.csv", "r", encoding="ut
 
 df = pd.DataFrame(films_data)
 
-# -----------------------------
+
 # Dictionnaire des langues principales
-# -----------------------------
+
 langues = {
     "1": ("fr", "Français"),
     "2": ("en", "Anglais"),
