@@ -2,12 +2,11 @@ import csv
 import pandas as pd
 import ast  # pour interpréter les listes sous forme de texte
 
-# -----------------------------
 # 1 Lecture du fichier CSV
-# -----------------------------
+
 films_data = []
 
-with open("data/dataset/movies_metadata_credits_joined 2.csv", "r", encoding="utf-8") as f:
+with open("data/dataset/movies_metadata_credits_joined.csv", "r", encoding="utf-8") as f:
     reader = csv.DictReader(f)
     for film in reader:
         titre = film.get("original_title", "").strip()
@@ -41,9 +40,9 @@ with open("data/dataset/movies_metadata_credits_joined 2.csv", "r", encoding="ut
 
 df = pd.DataFrame(films_data)
 
-# -----------------------------
+
 # Dictionnaire des langues principales
-# -----------------------------
+
 langues = {
     "1": ("fr", "Français"),
     "2": ("en", "Anglais"),
@@ -71,7 +70,7 @@ def genre_filtre():
 
         choix_genre = input("Choisissez un genre valide : ").strip()
 
-        if choix_genre == "0":
+        if choix_genre == "0" | "q" | "Q" :
             return None  # quitter
 
         if choix_genre == "1":

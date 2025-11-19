@@ -22,7 +22,7 @@
             }
         ],
         "ratings": {},
-        "connections": 5,
+        "connections": 9,
         "favorite_genres": {
             "Action": 1,
             "Drama": 1,
@@ -33,6 +33,33 @@
             "en": 1,
             "it": 1
         },
+        "average_duration": []
+    },
+    "c": {
+        "username": "c",
+        "search_history": [],
+        "ratings": {},
+        "connections": 1,
+        "favorite_genres": {},
+        "favorite_language": {},
+        "average_duration": []
+    },
+    "q": {
+        "username": "q",
+        "search_history": [],
+        "ratings": {},
+        "connections": 1,
+        "favorite_genres": {},
+        "favorite_language": {},
+        "average_duration": []
+    },
+    "alex": {
+        "username": "alex",
+        "search_history": [],
+        "ratings": {},
+        "connections": 2,
+        "favorite_genres": {},
+        "favorite_language": {},
         "average_duration": []
     }
 }
