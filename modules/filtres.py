@@ -6,7 +6,7 @@ import ast  # pour interpréter les listes sous forme de texte
 
 films_data = []
 
-with open("data/dataset/movies_metadata_credits_joined 2.csv", "r", encoding="utf-8") as f:
+with open("data/dataset/movies_metadata_credits_joined.csv", "r", encoding="utf-8") as f:
     reader = csv.DictReader(f)
     for film in reader:
         titre = film.get("original_title", "").strip()

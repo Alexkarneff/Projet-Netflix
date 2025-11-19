@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
+import json
 
-movies_dataset = pd.read_csv("data/dataset/movies_metadata_credits_joined 2.csv", sep = ",")
+movies_dataset = pd.read_csv("data/dataset/movies_metadata_credits_joined.csv", sep = ",")
 
 from modules import utilisateur
 from modules import filtres
 from modules import stats
-from modules import recherches2
+from modules import recherches
 
 def afficher_menu_principal():
     # Affiche le menu principal.
@@ -34,7 +35,7 @@ def main() :
                        filtres.programme_filtre()
 
                 case "2":                                           #choix 2 Rechercher un film
-                        recherches2.main()
+                        recherches.main()
                         # utilisateur.save_users(users)  # Sauvegarder l'historique après la recherche
 
                 case "3":                                           #choix 3 Noter un film
