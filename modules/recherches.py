@@ -8,6 +8,7 @@ import math
 import pandas as pd
 from pathlib import Path
 
+from modules.utilisateur import search_record
 # ---------- Couleurs ANSI ----------
 class C:
     HEADER = "\033[95m"
@@ -22,6 +23,31 @@ class C:
 
 BASE = Path(__file__).parent
 DEFAULT_DATA = BASE / "../data/dataset/movies_metadata_credits_joined.csv"
+
+# ---------- Gestion utilisateur ----------
+current_user = None
+
+def set_current_user(user):
+    """Définit l'utilisateur actuel pour le module de recherche."""
+    global current_user
+    current_user = user
+
+def record_search(search_type: str, criteria: str, film_title: str = None):
+    """Enregistre une recherche dans le profil de l'utilisateur."""
+    if current_user is None:
+        return
+    
+    search_entry = {
+        "type": search_type,
+        "criteria": criteria,
+    }
+    if film_title:
+        search_entry["film"] = film_title
+    
+    # Ajouter à l'historique de recherche de l'utilisateur
+    if not hasattr(current_user, 'search_history'):
+        current_user.search_history = []
+    current_user.search_history.append(search_entry)
 
 # ---------- Utils CSV ----------
 def load_dataframe(path_str: str | Path) -> pd.DataFrame:
@@ -259,6 +285,9 @@ def menu_principal(df: pd.DataFrame):
 
         mask = df[title_col].fillna("").str.contains(re.escape(titre), case=False, na=False)
         results = df[mask]
+        
+        # Enregistrer la recherche
+        record_search("recherche_titre", titre)
 
         if results.empty:
             print(f"{C.YELLOW}Le titre recherché n'est pas dans la base de donnée.{C.RESET}", flush=True)
@@ -281,6 +310,10 @@ def menu_principal(df: pd.DataFrame):
                 if 0 <= idx < len(readable):
                     chosen_index = results.iloc[idx:idx+1].index[0]
                     film_row = results.loc[chosen_index]
+                    
+                    # Enregistrer le film sélectionné
+                    film_title = film_row.get(title_col, "")
+                    record_search("film_selectionne", titre, film_title)
 
                     print(f"\n{C.BOLD}{C.CYAN}=== Informations sur le film sélectionné ==={C.RESET}", flush=True)
                     detail_df = make_readable(results.loc[[chosen_index]], limit=1, prefer_title_col=title_col)
@@ -307,6 +340,10 @@ def _afficher_filtre_colonly(df: pd.DataFrame, colonne_filtre: str, valeur: str,
 
     mask = df[col].fillna("").str.contains(re.escape(valeur), case=False, na=False)
     subset = df[mask]
+    
+    # Enregistrer la recherche
+    record_search(f"filtre_{colonne_filtre}", valeur)
+    
     if subset.empty:
         print("Aucun résultat.", flush=True)
         return
@@ -325,6 +362,14 @@ def _filtrer_par_duree(df: pd.DataFrame, min_min: int | None, max_min: int | Non
         mask &= durees <= max_min
 
     subset = df[mask]
+    
+    # Enregistrer la recherche
+    criteria = f"{min_min or 0}-{max_min or '∞'} min"
+    record_search("filtre_duree", criteria)
+    if min_min or max_min:
+        if min_min: search_record(current_user, duration=min_min)
+        if max_min: search_record(current_user, duration=max_min)
+    
     if subset.empty:
         print("Aucun film ne correspond à cette plage de durée.", flush=True)
         return
@@ -351,6 +396,10 @@ def _filtrer_par_annee(df: pd.DataFrame, year_str: str, title_col: str):
         return
 
     subset = df_local[df_local["_year"] == year]
+    
+    # Enregistrer la recherche
+    record_search("filtre_annee", str(year))
+    
     if subset.empty:
         print("Aucun film trouvé pour cette année.", flush=True)
         return
@@ -465,6 +514,11 @@ def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
                 print(f"{C.YELLOW}[INFO]{C.RESET} Colonne '_genres' indisponible.", flush=True)
             else:
                 subset = df_local[df_local["_genres"].fillna("").str.contains(re.escape(crit), case=False, na=False)]
+                
+                # Enregistrer la recherche
+                record_search("filtre_genre", crit)
+                search_record(current_user, genre=crit)
+
                 if subset.empty:
                     print("Aucun résultat.", flush=True)
                 else:
@@ -557,7 +611,8 @@ def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
         elif choix == "6":
             crit = prompt("> Langue (code ex: en, fr ou nom ex: English, French) : ")
             _filtrer_par_langue(df, crit, title_col)
-
+            record_search("filtre_langue", crit)
+            search_record(current_user, language=crit)
         elif choix.lower() in {"q", "quit", "exit"}:
             break
 
@@ -577,10 +632,4 @@ def main():
     df = load_dataframe(args.data)
     df = _ensure_display_columns(df)
 
-    print(f"{C.DIM}[INFO] Fichier chargé : {args.data}{C.RESET}", flush=True)
-    print(f"{C.DIM}[INFO] Nombre de lignes : {len(df)}{C.RESET}", flush=True)
-
     menu_principal(df)
-
-if __name__ == "__main__":
-    main()

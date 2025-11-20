@@ -231,7 +231,3 @@ def programme_filtre():
                 continue
             else:
                 print("Réponse invalide, retour au menu principal.")
-
-
-
-
