@@ -20,28 +20,14 @@ def programme_admin():
         affichage_admin()
         choix = input("Choisissez une option : ").strip()
         match choix :
-            case "1" :
-                    confirmation = input("Êtes-vous sûr de vouloir supprimer TOUTES les données ? (oui/non) : ")               
-                    if confirmation.lower() == "oui":    
-                        with open(USER_FILE, "w") as file:
-                            json.dump({}, file)
-                        print("Toutes les données ont été supprimées")
-            case "2" :
-                    with open(USER_FILE, "r") as file:
-                        try:
-                            data = json.load(file)
-                        except json.JSONDecodeError:
-                            print("Fichier JSON vide ou invalide.")
-                        continue
-                    if isinstance(data, dict):
-                        users_list = data.get("users", [])
-                    elif isinstance(data, list):
-                        users_list = data
-                    else:
-                        users_list = []
-                    
-                    unique_users = {user["username"] for user in users_list if "username" in user}
-                    print(f"Nombre d'utilisateurs différents : {len(unique_users)}")
+            case "1":
+                confirmation = input("Êtes-vous sûr de vouloir supprimer TOUTES les données ? (oui/non) : ")
+                if confirmation.lower() == "oui":
+                    utilisateur.save_users({})  # sauvegarde un dictionnaire vide
+                    print("Toutes les données ont été supprimées")
+            case "2":
+                users = utilisateur.load_users()
+                print(f"Nombre d'utilisateurs différents : {len(users)}")
 
             case "q" | "quit" | "quitter":
                 programme_admin= False

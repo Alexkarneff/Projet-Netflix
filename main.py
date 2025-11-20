@@ -70,8 +70,7 @@ def main() :
                         else:
                             print("Suppression annulée.")
                 case "admin":                                                                       # menu admin
-                        admin.programme_admin()
-                        utilisateur.save_users(users)                                                  
+                        admin.programme_admin()                                               
 
                 case "Q" | "q":                                                                   # choix 6 Déconnexion de l'utilisateur
                         print("Merci d'avoir utilisé le moteur Netflix. À bientôt !")                           
