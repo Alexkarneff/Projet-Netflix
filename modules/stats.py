@@ -22,7 +22,6 @@ def stats_globales(dataset):
 
             
 
-# stats_globales(movies_dataset)
 
 
 

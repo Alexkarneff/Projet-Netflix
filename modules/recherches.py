@@ -65,29 +65,23 @@ def _parse_duration_to_minutes(raw) -> int | None:
     s = str(raw).strip().lower()
     if not s:
         return None
-    # nombre simple => minutes (si très grand → secondes)
     try:
         f = float(s)
         return int(round(f / 60)) if f > 10000 else int(round(f))
     except Exception:
         pass
-    # HH:MM
     m = re.fullmatch(r"(\d{1,2}):(\d{1,2})", s)
     if m:
         return int(m.group(1)) * 60 + int(m.group(2))
-    # XhYY / X h YY
     m = re.fullmatch(r"(\d+)\s*h\s*(\d+)", s)
     if m:
         return int(m.group(1)) * 60 + int(m.group(2))
-    # Xh
     m = re.fullmatch(r"(\d+)\s*h", s)
     if m:
         return int(m.group(1)) * 60
-    # YYm / min / minutes
     m = re.fullmatch(r"(\d+)\s*(m|min|mins|minute|minutes)", s)
     if m:
         return int(m.group(1))
-    # secondes → minutes
     m = re.fullmatch(r"(\d+)\s*(s|sec|secs|seconde|secondes)", s)
     if m:
         return int(round(int(m.group(1)) / 60))
@@ -107,7 +101,6 @@ def _ensure_duration_minutes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def _ensure_year_column(df: pd.DataFrame) -> pd.DataFrame:
-    """Crée une colonne _year (int) à partir de release_year/year/release_date si possible."""
     if "_year" in df.columns:
         return df
     year_col = None
@@ -139,9 +132,12 @@ def _ensure_display_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = _ensure_year_column(df)
     return df
 
-def make_readable(df: pd.DataFrame, limit: int | None = None) -> pd.DataFrame:
+def make_readable(df: pd.DataFrame, limit: int | None = None, prefer_title_col: str | None = None) -> pd.DataFrame:
     res = _ensure_display_columns(df.copy())
-    title_col = next((c for c in ["title", "original_title", "movie_title"] if c in res.columns), None)
+    if prefer_title_col and prefer_title_col in res.columns:
+        title_col = prefer_title_col
+    else:
+        title_col = next((c for c in ["title", "original_title", "movie_title"] if c in res.columns), None)
     date_col  = next((c for c in ["release_date", "year", "release_year"] if c in res.columns), None)
     cols = [c for c in [title_col, date_col, "_genres", "_cast", "_duration_min"] if c]
     if not cols:
@@ -152,9 +148,57 @@ def make_readable(df: pd.DataFrame, limit: int | None = None) -> pd.DataFrame:
     pd.set_option("display.max_colwidth", 140)
     return out
 
+# ---------- Pagination (5 résultats par page) ----------
+def _paginate_df(df_show: pd.DataFrame, page_size: int = 5, title: str | None = None):
+    """Affiche df_show par pages de page_size (5) avec navigation n/p/q."""
+    def _ask(msg: str) -> str:
+        try:
+            return input(msg).strip()
+        except EOFError:
+            return "q"
+
+    if df_show is None or df_show.empty:
+        print("Aucun résultat.", flush=True)
+        return
+
+    total = len(df_show)
+    pages = max(1, math.ceil(total / page_size))
+    page = 0
+
+    while True:
+        start = page * page_size
+        end = min(start + page_size, total)
+        chunk = df_show.iloc[start:end]
+
+        header = f"{title} — " if title else ""
+        print(
+            f"\n{C.BOLD}{header}Page {page+1}/{pages} "
+            f"(résultats {start+1}-{end}/{total}){C.RESET}",
+            flush=True
+        )
+        print(chunk.to_string(index=False), flush=True)
+
+        if pages == 1:
+            return
+
+        cmd = _ask(f"{C.GREEN}> n=suivant, p=précédent, q=quitter : {C.RESET}").lower()
+        if cmd in {"q", "quit", "exit", ""}:
+            return
+        elif cmd == "n":
+            if page < pages - 1:
+                page += 1
+            else:
+                print("Déjà à la dernière page.", flush=True)
+        elif cmd == "p":
+            if page > 0:
+                page -= 1
+            else:
+                print("Déjà à la première page.", flush=True)
+        else:
+            print("Commande invalide.", flush=True)
+
 # ---------- Helpers affichage ciblé ----------
-def _print_only_column(df: pd.DataFrame, column: str, label: str | None = None, limit: int = 20):
-    """Affiche uniquement la colonne demandée (sortie la plus précise possible)."""
+def _print_only_column(df: pd.DataFrame, column: str, label: str | None = None, page_size: int = 5):
     if column not in df.columns:
         print(f"{C.YELLOW}[INFO]{C.RESET} Colonne '{column}' indisponible.", flush=True)
         return
@@ -162,11 +206,10 @@ def _print_only_column(df: pd.DataFrame, column: str, label: str | None = None, 
     if ser.empty:
         print("Aucun résultat.", flush=True)
         return
-    to_show = pd.DataFrame({label or column: ser.head(limit)})
-    print(to_show.to_string(index=False), flush=True)
+    to_show = pd.DataFrame({label or column: ser})
+    _paginate_df(to_show, page_size=page_size, title=label or column)
 
 def _print_fiche_complete(film_row: pd.Series):
-    """Affichage complet des infos d'un film."""
     print(f"\n{C.BOLD}{C.HEADER}=== Fiche complète du film ==={C.RESET}", flush=True)
     champs_cles = [
         "title", "original_title", "movie_title",
@@ -219,36 +262,30 @@ def menu_principal(df: pd.DataFrame):
 
         if results.empty:
             print(f"{C.YELLOW}Le titre recherché n'est pas dans la base de donnée.{C.RESET}", flush=True)
-            choix = prompt('> Saisir "revenir au menu précédent" pour revenir, ou Entrée pour réessayer : ')
-            if choix.lower() == "revenir au menu précédent" | "q":
-                continue
-            else:
-                continue
+            prompt("> Entrée pour réessayer : ")
+            continue
 
-        readable = make_readable(results, limit=5)
+        readable = make_readable(results, limit=5, prefer_title_col=title_col)
         print(f"\n{C.BOLD}Résultats trouvés (max 5) :{C.RESET}\n", flush=True)
         for i, (_, row) in enumerate(readable.iterrows(), start=1):
-            t = str(row.get(title_col, ""))
+            t = str(row.get(title_col, "")) or str(row.iloc[0])
             d = str(row.get("release_date", "")) if "release_date" in readable.columns else ""
             print(f"{C.BLUE}[{i}]{C.RESET} {t}  {C.DIM}{d}{C.RESET}", flush=True)
 
         while True:
             sel = prompt(f'\n{C.GREEN}> Choisis un numéro (ou tape "revenir au menu précédent") : {C.RESET}')
-            if sel.lower() == "revenir au menu précédent":
+            if sel.lower() == "revenir au menu précédent" or sel.lower() == "q":
                 break
             if sel.isdigit():
                 idx = int(sel) - 1
                 if 0 <= idx < len(readable):
-                    # Récupérer l’index réel dans le DataFrame d’origine
                     chosen_index = results.iloc[idx:idx+1].index[0]
                     film_row = results.loc[chosen_index]
 
-                    # Afficher la fiche détaillée du film avant le sous-menu filtres
                     print(f"\n{C.BOLD}{C.CYAN}=== Informations sur le film sélectionné ==={C.RESET}", flush=True)
-                    detail_df = make_readable(results.loc[[chosen_index]], limit=1)
+                    detail_df = make_readable(results.loc[[chosen_index]], limit=1, prefer_title_col=title_col)
                     print(detail_df.to_string(index=False), flush=True)
 
-                    # Puis lancer le sous-menu filtres
                     submenu_filtres(df, film_row, title_col)
                     break
             print(f"{C.YELLOW}Sélection invalide.{C.RESET}", flush=True)
@@ -256,11 +293,8 @@ def menu_principal(df: pd.DataFrame):
 def _afficher_filtre_colonly(df: pd.DataFrame, colonne_filtre: str, valeur: str,
                              col_reelle: str | None = None,
                              only_print_col: str | None = None,
-                             label: str | None = None):
-    """
-    Filtre sur `colonne_filtre` (ou `col_reelle` si colonne absente) avec sous-chaîne `valeur`,
-    puis n'imprime QUE la colonne `only_print_col` (ou la colonne effective si None).
-    """
+                             label: str | None = None,
+                             page_size: int = 5):
     col = colonne_filtre if colonne_filtre in df.columns else (
         col_reelle if col_reelle and col_reelle in df.columns else None
     )
@@ -278,13 +312,9 @@ def _afficher_filtre_colonly(df: pd.DataFrame, colonne_filtre: str, valeur: str,
         return
 
     col_affichee = only_print_col or col
-    _print_only_column(subset, col_affichee, label=label or col_affichee, limit=10)
+    _print_only_column(subset, col_affichee, label=label or col_affichee, page_size=page_size)
 
 def _filtrer_par_duree(df: pd.DataFrame, min_min: int | None, max_min: int | None, title_col: str):
-    """
-    Filtre les films par durée (en minutes) sur toute la base, puis affiche
-    titre + date + durée (en minutes).
-    """
     df = _ensure_duration_minutes(df.copy())
     durees = pd.to_numeric(df["_duration_min"], errors="coerce")
     mask = pd.Series(True, index=df.index)
@@ -309,10 +339,8 @@ def _filtrer_par_duree(df: pd.DataFrame, min_min: int | None, max_min: int | Non
         cols.append("release_date")
     cols.append("_duration_min")
 
-    to_show = subset.loc[:, cols].head(5)
-    to_show = to_show.rename(columns={"_duration_min": "duration_min"})
-    print(f"\n{C.BOLD}Films trouvés :{C.RESET}", flush=True)
-    print(to_show.to_string(index=False), flush=True)
+    to_show = subset.loc[:, cols].rename(columns={"_duration_min": "duration_min"})
+    _paginate_df(to_show, page_size=5, title="Films trouvés (durée)")
 
 def _filtrer_par_annee(df: pd.DataFrame, year_str: str, title_col: str):
     df_local = _ensure_year_column(df.copy())
@@ -322,8 +350,7 @@ def _filtrer_par_annee(df: pd.DataFrame, year_str: str, title_col: str):
         print(f"{C.YELLOW}Année invalide (entrez un entier comme 1995).{C.RESET}", flush=True)
         return
 
-    mask = df_local["_year"] == year
-    subset = df_local[mask]
+    subset = df_local[df_local["_year"] == year]
     if subset.empty:
         print("Aucun film trouvé pour cette année.", flush=True)
         return
@@ -335,17 +362,75 @@ def _filtrer_par_annee(df: pd.DataFrame, year_str: str, title_col: str):
         cols.append("release_date")
     cols.append("_year")
 
-    to_show = subset.loc[:, cols].head(5).rename(columns={"_year": "year"})
-    print(f"\n{C.BOLD}Films sortis en {year} :{C.RESET}", flush=True)
-    print(to_show.to_string(index=False), flush=True)
+    to_show = subset.loc[:, cols].rename(columns={"_year": "year"})
+    _paginate_df(to_show, page_size=5, title=f"Films sortis en {year}")
+
+# ---------- Langue ----------
+def _build_language_text(df: pd.DataFrame) -> pd.Series:
+    parts = []
+    if "original_language" in df.columns:
+        parts.append(df["original_language"].fillna("").astype(str))
+
+    if "spoken_languages" in df.columns:
+        spoken_names = df["spoken_languages"].apply(
+            lambda v: _parse_list_of_dicts(v, key="name")
+        ).fillna("").astype(str)
+        spoken_codes = df["spoken_languages"].apply(
+            lambda v: _parse_list_of_dicts(v, key="iso_639_1")
+        ).fillna("").astype(str)
+        parts.append(spoken_names)
+        parts.append(spoken_codes)
+
+    if not parts:
+        return pd.Series([""] * len(df), index=df.index)
+
+    combined = parts[0]
+    for p in parts[1:]:
+        combined = combined + " | " + p
+    return combined
+
+def _filtrer_par_langue(df: pd.DataFrame, crit: str, title_col: str):
+    crit = (crit or "").strip()
+    if not crit:
+        print("Langue vide.", flush=True)
+        return
+
+    lang_text = _build_language_text(df)
+    subset = df[lang_text.str.contains(re.escape(crit), case=False, na=False)]
+
+    if subset.empty:
+        print("Aucun film trouvé pour cette langue.", flush=True)
+        return
+
+    cols = []
+    if title_col in subset.columns:
+        cols.append(title_col)
+    if "release_date" in subset.columns:
+        cols.append("release_date")
+    if "original_language" in subset.columns:
+        cols.append("original_language")
+
+    if "spoken_languages" in subset.columns:
+        tmp = subset["spoken_languages"].apply(
+            lambda v: _truncate(_parse_list_of_dicts(v, key="name"), 60)
+        )
+        subset = subset.copy()
+        subset["_spoken_langs"] = tmp
+        cols.append("_spoken_langs")
+
+    to_show = subset.loc[:, cols].rename(
+        columns={
+            title_col: "Titre",
+            "release_date": "Date",
+            "original_language": "Langue (code)",
+            "_spoken_langs": "Langues parlées"
+        }
+    )
+    _paginate_df(to_show, page_size=5, title=f"Films en langue '{crit}'")
 
 def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
-    """
-    Sous-menu qui permet de lancer des recherches par filtres,
-    en n'affichant que certaines colonnes (par exemple uniquement 'original_title').
-    """
     while True:
-        print(f"\n{C.CYAN}{C.BOLD}=== Sous-menu Recherches ==={C.RESET}", flush=True)
+        print(f"\n{C.CYAN}{C.BOLD}=== Sous-menu recherches ==={C.RESET}", flush=True)
         print(f"{C.DIM}Film sélectionné :{C.RESET} {film_row.get(title_col, '')}", flush=True)
         print("0) Afficher la fiche complète de ce film", flush=True)
         print("1) Rechercher par original_title ", flush=True)
@@ -353,6 +438,7 @@ def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
         print("3) Acteur/actrice (casting + recherche dans toute la base)", flush=True)
         print("4) Rechercher par durée (en minutes, sur toute la base)", flush=True)
         print("5) Rechercher par année de sortie", flush=True)
+        print("6) Rechercher par langue (original_language / spoken_languages)", flush=True)
         print("q) Revenir au menu précédent", flush=True)
 
         choix = prompt(f"{C.GREEN}> Votre choix : {C.RESET}")
@@ -368,35 +454,31 @@ def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
                 valeur=crit,
                 only_print_col="original_title",
                 label="original_title",
+                page_size=5
             )
 
         elif choix == "2":
             crit = prompt("> Genre (ex: Action, Drama...) : ")
-
             df_local = _ensure_display_columns(df.copy())
+
             if "_genres" not in df_local.columns:
                 print(f"{C.YELLOW}[INFO]{C.RESET} Colonne '_genres' indisponible.", flush=True)
             else:
-                mask = df_local["_genres"].fillna("").str.contains(re.escape(crit), case=False, na=False)
-                subset = df_local[mask]
-
+                subset = df_local[df_local["_genres"].fillna("").str.contains(re.escape(crit), case=False, na=False)]
                 if subset.empty:
                     print("Aucun résultat.", flush=True)
                 else:
                     cols = []
                     if title_col in subset.columns:
                         cols.append(title_col)
-                    if "_genres" in subset.columns:
-                        cols.append("_genres")
+                    cols.append("_genres")
 
-                    to_show = subset.loc[:, cols].head(5).rename(
+                    to_show = subset.loc[:, cols].rename(
                         columns={title_col: "Titre", "_genres": "Genres"}
                     )
-                    print(f"\n{C.BOLD}Films trouvés pour ce genre :{C.RESET}", flush=True)
-                    print(to_show.to_string(index=False), flush=True)
+                    _paginate_df(to_show, page_size=5, title=f"Films du genre '{crit}'")
 
         elif choix == "3":
-            # Sous-menu spécifique pour les acteurs / actrices
             while True:
                 print(f"\n{C.CYAN}--- Sous-menu acteur/actrice ---{C.RESET}", flush=True)
                 print("1) Afficher le casting complet de ce film", flush=True)
@@ -427,16 +509,15 @@ def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
                         valeur=crit,
                         only_print_col=title_col,
                         label="Titre",
+                        page_size=5
                     )
 
                 elif sub.lower() in {"q", "quit", "exit"}:
                     break
-
                 else:
                     print("Choix invalide.", flush=True)
 
         elif choix == "4":
-            # Sous-menu spécifique pour la durée
             while True:
                 print(f"\n{C.CYAN}--- Sous-menu durée (minutes) ---{C.RESET}", flush=True)
                 print("Entrez une plage de durée en minutes (laisser vide pour pas de borne).", flush=True)
@@ -472,6 +553,10 @@ def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
         elif choix == "5":
             year_str = prompt("> Année (ex: 1995) : ")
             _filtrer_par_annee(df, year_str, title_col)
+
+        elif choix == "6":
+            crit = prompt("> Langue (code ex: en, fr ou nom ex: English, French) : ")
+            _filtrer_par_langue(df, crit, title_col)
 
         elif choix.lower() in {"q", "quit", "exit"}:
             break
