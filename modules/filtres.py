@@ -1,6 +1,5 @@
 import csv
 import pandas as pd
-import ast  # pour interpréter les listes sous forme de texte
 
 # 1 Lecture du fichier CSV
 
@@ -53,6 +52,65 @@ langues = {
     "7": ("zh", "Chinois")
 }
 
+# Naviguer entre les films 5 par 5
+
+def naviguer_films(df_films, titre_contexte="Films"):
+   
+    if df_films.empty:
+        print("Aucun film à afficher.")
+        return
+    
+    total_films = len(df_films)
+    films_par_page = 5
+    page_actuelle = 0
+    total_pages = (total_films + films_par_page - 1) // films_par_page
+    
+    while True:
+        # Calculer les indices de début et fin pour la page actuelle
+        debut = page_actuelle * films_par_page
+        fin = min(debut + films_par_page, total_films)
+        
+        # Afficher l'en-tête
+        print(f"{titre_contexte} - Page {page_actuelle + 1}/{total_pages}")
+        
+        # Afficher les films de la page actuelle
+        films_page = df_films.iloc[debut:fin]
+        for idx, (_, film) in enumerate(films_page.iterrows(), start=debut + 1):
+            titre = film.get("titre", "N/A")
+            genre = film.get("genre", "N/A")
+            langue = film.get("langue", "N/A")
+            duree = film.get("duree", "N/A")
+            
+            print(f"\n{idx}. {titre}")
+            print(f"   Genre: {genre} | Langue: {langue} | Durée: {duree} min")
+        
+        # Afficher les options de navigation
+        print("\n" + "-"*60)
+        options = []
+        if page_actuelle < total_pages - 1:
+            options.append("n/Entrée: Suivant")
+        if page_actuelle > 0:
+            options.append("p: Précédent")
+        options.append("q: Quitter")
+        print(" | ".join(options))
+        
+        # Demander l'action à l'utilisateur
+        choix = input("\nVotre choix : ").strip().lower()
+        
+        if choix in ("q", "quit", "quitter"):
+            break
+        elif choix in ("n", "next", "suivant", ""):
+            if page_actuelle < total_pages - 1:
+                page_actuelle += 1
+            else:
+                print("Vous êtes déjà à la dernière page.")
+        elif choix in ("p", "prev", "précédent", "precedent"):
+            if page_actuelle > 0:
+                page_actuelle -= 1
+            else:
+                print("Vous êtes déjà à la première page.")
+        else:
+            print("Commande non reconnue. Utilisez 'n' (suivant), 'p' (précédent) ou 'q' (quitter).")
 # -----------------------------
 # Fonction pour filtrer par genre
 # -----------------------------
@@ -70,7 +128,8 @@ def genre_filtre():
 
         choix_genre = input("Choisissez un genre valide : ").strip()
 
-        if choix_genre == "0" | "q" | "Q" :
+
+        if choix_genre in ("0", "q", "Q"):
             return None  # quitter
 
         if choix_genre == "1":
@@ -141,18 +200,34 @@ def programme_filtre():
         if df_filtre_genre is None:
             programme_actif = False
         else:
-            # Nouvelle étape : demander si on veut filtrer par langue
-            print(f"\nFilms trouvés pour ce genre ({len(df_filtre_genre)}) :")
-            reponse = input("Voulez vous filtrer par langue ? (o/n) ")
+            # Afficher le nombre de films trouvés
+            print(f"\n{len(df_filtre_genre)} films trouvés pour ce genre.")
+            
+            # Nouvelle option : navigation ou filtre par langue
+            print("\nOptions :")
+            print("1. Naviguer dans tous les films du genre sélectionné")
+            print("2. Filtrer par langue")
+            print("0. Retour au menu principal")
+            
+            reponse = input("\nVotre choix : ").strip()
 
-            if reponse == "n":
-                print("\n--- Résultats du filtre par genre ---")
-                print(df_filtre_genre.head(10))
+            if reponse == "1":
+                # Navigation dans les films du genre
+                naviguer_films(df_filtre_genre, f"Films du genre sélectionné")
                 input("\nAppuyez sur Entrée pour revenir au menu principal...")
-            elif reponse == "o":
+            elif reponse == "2":
+                # Filtre par langue
                 df_filtre_langue = langue_filtre(df_filtre_genre)
-                if df_filtre_langue is not None:
-                    print("\n--- Recherche terminée ---")
-                    input("Appuyez sur Entrée pour revenir au menu principal...")
+                if df_filtre_langue is not None and not df_filtre_langue.empty:
+                    print(f"\n{len(df_filtre_langue)} films trouvés après filtrage par langue.")
+                    
+                    # Proposer la navigation sur les films filtrés
+                    voir_films = input("Voulez-vous naviguer dans ces films ? (o/n) : ").strip().lower()
+                    if voir_films == "o":
+                        naviguer_films(df_filtre_langue, "Films filtrés par genre et langue")
+                    
+                    input("\nAppuyez sur Entrée pour revenir au menu principal...")
+            elif reponse == "0":
+                continue
             else:
                 print("Réponse invalide, retour au menu principal.")

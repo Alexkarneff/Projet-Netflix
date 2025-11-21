@@ -43,9 +43,10 @@ class User:                             # La Classe qui représente un utilisate
 
 def load_users():
     if os.path.exists(USER_FILE):
-        with open(USER_FILE, "r") as f:
-            data = json.load(f)
-            return {name: User.from_dict(info) for name, info in data.items()}
+        if os.path.getsize(USER_FILE)>0:
+            with open(USER_FILE, "r", encoding='utf-8') as f:
+                data = json.load(f)
+                return {name: User.from_dict(info) for name, info in data.items()}
     else:
         return {}
     
@@ -64,8 +65,8 @@ def create_user(users, username):                               # Crée un nouve
 
 
 def save_users(users):                                      # Enregistre les données utilisateur
-     with open(USER_FILE, "w") as f:
-        json.dump({u: user.to_dict() for u, user in users.items()}, f, indent=4)
+     with open(USER_FILE, "w", encoding='utf-8') as f:
+        json.dump({u: user.to_dict() for u, user in users.items()}, f, indent=4, ensure_ascii=False)
 
 def search_record(user, genre=None, language=None, duration=None):               #Enregistre les recherches utilisateur
     user.search_history.append({"genre": genre, "language": language, "duration": duration})
@@ -85,40 +86,48 @@ def rate_movie(user, title, rating):                        # Permet à l'utilis
         print("La note doit être comprise entre 1 et 5.")
 
 
-def user_statistics(user):                      # Affiche les statistiques de l'utilisateur
-  
+def user_statistics(user):
     if not user.search_history:
-        if user.connections :
+        if user.connections:
             print(f"\n Vous vous êtes connecté {user.connections} fois")
-
         print("\n Aucune recherche effectuée pour le moment.")
         return
     
-    print(f"\n Nombre total de recherches : {len(user.search_history)}\n")
-    
+    print(f"\n=== STATISTIQUES UTILISATEUR ===")
+    print(f"Nombre total de recherches : {len(user.search_history)}")
 
+    # Afficher les films consultés
+    films_consultes = [s.get("film") for s in user.search_history if "film" in s]
+    if films_consultes:
+        print(f"\nFilms consultés ({len(set(films_consultes))} films uniques) :")
+        for film in list(dict.fromkeys(films_consultes)):
+            print(f"  • {film}")
+
+    # Genres les plus recherchés
     if user.favorite_genres:
-        print("\n Genre les plus recherchés :")
+        print("\nGenres les plus recherchés :")
         genres_tries = sorted(user.favorite_genres.items(), key=lambda x: x[1], reverse=True)
         for genre, count in genres_tries[:5]:
-            print(f"  • {genre}: {count} fois")
-   
+            print(f"  • {genre} : {count} fois")
+
+    # Langues les plus recherchées
     if user.favorite_language:
-        print("\n Langues les plus recherchées :")
+        print("\nLangues les plus recherchées :")
         language_tries = sorted(user.favorite_language.items(), key=lambda x: x[1], reverse=True)
         for language, count in language_tries[:5]:
-            print(f"  • {language}: {count} fois")
-    
+            print(f"  • {language} : {count} fois")
+
+    # Durée moyenne recherchée
     if user.average_duration:
         duree_moy = sum(user.average_duration) / len(user.average_duration)
-        print(f"\n Duréee moyenne recherchée :")
-        print(f"  {int(duree_moy)} minutes")
+        print(f"\nDurée moyenne recherchée : {int(duree_moy)} minutes")
 
-
-    if user.connections :
-        print(f"\n Vous vous êtes connecté {user.connections} fois")
+    # Nombre de connexions
+    if user.connections:
+        print(f"\nVous vous êtes connecté {user.connections} fois")
 
 def delete_user(users,username):                            # Supprime les données personnelles d'un utilisateur.
+    ""
     if username in users :
         del users[username]
         save_users(users)
