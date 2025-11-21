@@ -1,1 +1,131 @@
-{}
+{
+    "Alexandre": {
+        "username": "Alexandre",
+        "search_history": [
+            {
+                "type": "recherche_titre",
+                "criteria": "T"
+            },
+            {
+                "type": "film_selectionne",
+                "criteria": "T",
+                "film": "Toy Story"
+            },
+            {
+                "type": "filtre_genre",
+                "criteria": "Action"
+            },
+            {
+                "genre": "Action",
+                "language": null,
+                "duration": null
+            },
+            {
+                "type": "filtre_genre",
+                "criteria": "Action"
+            },
+            {
+                "genre": "Action",
+                "language": null,
+                "duration": null
+            },
+            {
+                "type": "filtre_genre",
+                "criteria": "Drama"
+            },
+            {
+                "genre": "Drama",
+                "language": null,
+                "duration": null
+            },
+            {
+                "type": "filtre_genre",
+                "criteria": "d"
+            },
+            {
+                "genre": "d",
+                "language": null,
+                "duration": null
+            },
+            {
+                "type": "filtre_genre",
+                "criteria": "Comedy"
+            },
+            {
+                "genre": "Comedy",
+                "language": null,
+                "duration": null
+            },
+            {
+                "type": "filtre_langue",
+                "criteria": "en"
+            },
+            {
+                "genre": null,
+                "language": "en",
+                "duration": null
+            },
+            {
+                "type": "filtre_langue",
+                "criteria": "fr"
+            },
+            {
+                "genre": null,
+                "language": "fr",
+                "duration": null
+            },
+            {
+                "type": "filtre_langue",
+                "criteria": "de"
+            },
+            {
+                "genre": null,
+                "language": "de",
+                "duration": null
+            },
+            {
+                "type": "recherche_titre",
+                "criteria": "A"
+            },
+            {
+                "type": "film_selectionne",
+                "criteria": "A",
+                "film": "Jumanji"
+            },
+            {
+                "type": "filtre_cast",
+                "criteria": "a"
+            },
+            {
+                "type": "recherche_titre",
+                "criteria": ""
+            }
+        ],
+        "ratings": {
+            "Jumanji": 4,
+            "Toy Story": 4,
+            "Titanic": 4
+        },
+        "connections": 12,
+        "favorite_genres": {
+            "Action": 2,
+            "Drama": 1,
+            "Comedy": 1
+        },
+        "favorite_language": {
+            "en": 1,
+            "fr": 1,
+            "de": 1
+        },
+        "average_duration": []
+    },
+    "q": {
+        "username": "q",
+        "search_history": [],
+        "ratings": {},
+        "connections": 1,
+        "favorite_genres": {},
+        "favorite_language": {},
+        "average_duration": []
+    }
+}

@@ -28,12 +28,12 @@ DEFAULT_DATA = BASE / "../data/dataset/movies_metadata_credits_joined.csv"
 current_user = None
 
 def set_current_user(user):
-    """Définit l'utilisateur actuel pour le module de recherche."""
+    # Définit l'utilisateur actuel pour le module de recherche.
     global current_user
     current_user = user
 
 def record_search(search_type: str, criteria: str, film_title: str = None):
-    """Enregistre une recherche dans le profil de l'utilisateur."""
+    # Enregistrer une recherche dans le profil de l'utilisateur.
     if current_user is None:
         return
     
@@ -487,7 +487,7 @@ def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
         print("3) Acteur/actrice (casting + recherche dans toute la base)", flush=True)
         print("4) Rechercher par durée (en minutes, sur toute la base)", flush=True)
         print("5) Rechercher par année de sortie", flush=True)
-        print("6) Rechercher par langue (original_language / spoken_languages)", flush=True)
+        print("6) Rechercher par langue (langue de la bande originale du film)", flush=True)
         print("q) Revenir au menu précédent", flush=True)
 
         choix = prompt(f"{C.GREEN}> Votre choix : {C.RESET}")
@@ -551,9 +551,8 @@ def submenu_filtres(df: pd.DataFrame, film_row: pd.Series, title_col: str):
                         if not noms:
                             print("Aucune information de casting pour ce film.", flush=True)
                         else:
-                            print(f"\n{C.BOLD}Acteurs / actrices :{C.RESET}", flush=True)
-                            for nom in noms:
-                                print(f"- {nom}", flush=True)
+                            df_cast = pd.DataFrame({"Acteur/Actrice": noms})
+                            _paginate_df(df_cast, page_size=5, title="Casting complet")
 
                 elif sub == "2":
                     crit = prompt("> Nom (ou partie du nom) de l'acteur/actrice : ")

@@ -45,16 +45,11 @@ def main() :
                         utilisateur.save_users(users)
 
                 case "3":                                           # choix 3 Noter un film
-                        print("\n Noter un film ")
+                        print(" --- Noter un film ---")
                         title = input("Titre du film : ")
                         if title in movies_dataset["original_title"].values :
-                            try:
-                                rating = int(input("Note (1 à 5) : "))
-                            except ValueError:
-                                print("Veuillez entrer un nombre entre 1 et 5.")
-                            utilisateur.rate_movie(current_user, title, rating)           # enregistre la note de l'utilisateur pour le film
-                            utilisateur.save_users(users)                                 # enregistre les changements utilisateur
-                            continue
+                            utilisateur.rate_movie(current_user, title)                 # enregistre la note de l'utilisateur pour le film
+                            utilisateur.save_users(users)                               # enregistre les changements utilisateur
                         else :
                               print("Film Introuvable")
 
@@ -77,7 +72,7 @@ def main() :
                         break
                  
                 case _:
-                        print("Choix invalide. Veuillez entrer un chiffre de 1 à 6.")                   # gère les choix qui ne sont pas de 1 à 6
+                        print("Choix invalide. Veuillez entrer un chiffre de 1 à 5 ou q pour quitter.")                   # gère les choix qui ne sont pas de 1 à 6
                         continue
                   
 if __name__ == "__main__":

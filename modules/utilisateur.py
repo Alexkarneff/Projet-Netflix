@@ -78,13 +78,26 @@ def search_record(user, genre=None, language=None, duration=None):              
     if duration :
         user.average_duration.append(duration)
 
-def rate_movie(user, title, rating):                        # Permet à l'utilisateur de noter un film.
-    if 1 <= rating <= 5:
-        user.ratings[title] = rating
-        print(f"Vous avez noté {title} : {rating}/5")
-    else:
-        print("La note doit être comprise entre 1 et 5.")
+def rate_movie(user, title):                                                    # Permet à l'utilisateur de noter un film. 
+    while True:
+        try:
+            rating = (input("Entrez une note de 1 à 5: "))
 
+            if rating in ("q", "Q", "quit"):
+                break
+
+            rating = int(rating)
+
+            if rating in (1, 2, 3, 4, 5):
+                user.ratings[title] = rating
+                print(f"Vous avez noté {title} : {rating}/5")
+                break  # Sort de la boucle une fois la note valide
+
+            else:
+               print("La note doit être comprise entre 1 et 5.")
+
+        except ValueError:
+            print("Note invalide. Veuillez entrer un nombre entier.")
 
 def user_statistics(user):
     if not user.search_history:
@@ -127,7 +140,6 @@ def user_statistics(user):
         print(f"\nVous vous êtes connecté {user.connections} fois")
 
 def delete_user(users,username):                            # Supprime les données personnelles d'un utilisateur.
-    ""
     if username in users :
         del users[username]
         save_users(users)
