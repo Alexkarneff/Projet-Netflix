@@ -106,7 +106,7 @@
             "Toy Story": 4,
             "Titanic": 4
         },
-        "connections": 12,
+        "connections": 14,
         "favorite_genres": {
             "Action": 2,
             "Drama": 1,
@@ -121,6 +121,106 @@
     },
     "q": {
         "username": "q",
+        "search_history": [],
+        "ratings": {},
+        "connections": 1,
+        "favorite_genres": {},
+        "favorite_language": {},
+        "average_duration": []
+    },
+    "Demo": {
+        "username": "Demo",
+        "search_history": [
+            {
+                "type": "recherche_titre",
+                "criteria": ""
+            },
+            {
+                "type": "film_selectionne",
+                "criteria": "",
+                "film": "Waiting to Exhale"
+            },
+            {
+                "type": "filtre_original_title",
+                "criteria": "Ju"
+            },
+            {
+                "type": "filtre_genre",
+                "criteria": "Action"
+            },
+            {
+                "genre": "Action",
+                "language": null,
+                "duration": null
+            },
+            {
+                "type": "filtre_annee",
+                "criteria": "1995"
+            },
+            {
+                "type": "filtre_langue",
+                "criteria": "en"
+            },
+            {
+                "genre": null,
+                "language": "en",
+                "duration": null
+            },
+            {
+                "type": "filtre_langue",
+                "criteria": "fr"
+            },
+            {
+                "genre": null,
+                "language": "fr",
+                "duration": null
+            },
+            {
+                "type": "filtre_langue",
+                "criteria": "fr"
+            },
+            {
+                "genre": null,
+                "language": "fr",
+                "duration": null
+            },
+            {
+                "type": "filtre_langue",
+                "criteria": "es"
+            },
+            {
+                "genre": null,
+                "language": "es",
+                "duration": null
+            },
+            {
+                "type": "filtre_genre",
+                "criteria": "Drama"
+            },
+            {
+                "genre": "Drama",
+                "language": null,
+                "duration": null
+            }
+        ],
+        "ratings": {
+            "Jumanji": 4,
+            "Titanic": 5
+        },
+        "connections": 4,
+        "favorite_genres": {
+            "Action": 1,
+            "Drama": 1
+        },
+        "favorite_language": {
+            "en": 1,
+            "fr": 2,
+            "es": 1
+        },
+        "average_duration": []
+    },
+    "demo": {
+        "username": "demo",
         "search_history": [],
         "ratings": {},
         "connections": 1,

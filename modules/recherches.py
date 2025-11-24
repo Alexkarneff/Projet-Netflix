@@ -8,6 +8,8 @@ import math
 import pandas as pd
 from pathlib import Path
 
+# -*- coding: utf-8 -*-
+
 from modules.utilisateur import search_record
 # ---------- Couleurs ANSI ----------
 class C:
@@ -175,7 +177,7 @@ def make_readable(df: pd.DataFrame, limit: int | None = None, prefer_title_col: 
     return out
 
 # ---------- Pagination (5 résultats par page) ----------
-def _paginate_df(df_show: pd.DataFrame, page_size: int = 5, title: str | None = None):
+def _paginate_df(df_show: pd.DataFrame, page_size: int = 5, title: str | None = None):                  # Paginer les résultats par 5
     """Affiche df_show par pages de page_size (5) avec navigation n/p/q."""
     def _ask(msg: str) -> str:
         try:

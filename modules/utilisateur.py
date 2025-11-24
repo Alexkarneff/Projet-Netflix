@@ -1,6 +1,8 @@
 import json
 import os
 
+# -*- coding: utf-8 -*-
+
 USER_FILE = "data/users.json"
 
 class User:                             # La Classe qui représente un utilisateur avec ses infos
@@ -27,7 +29,7 @@ class User:                             # La Classe qui représente un utilisate
             "average_duration": self.average_duration
         }
     
-    def from_dict(data):                                #Reconstruit un objet User à partir du dictionnaire Json sauvegardé
+    def from_dict(data):                                # Reconstruit un objet User à partir du dictionnaire Json sauvegardé
         user = User(data["username"])
         user.search_history = data.get("search_history", [])
         user.ratings = data.get("ratings", {})

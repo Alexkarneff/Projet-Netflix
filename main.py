@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pandas as pd
 
 movies_dataset = pd.read_csv("data/dataset/movies_metadata_credits_joined.csv", sep = ",")

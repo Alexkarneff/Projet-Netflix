@@ -1,5 +1,6 @@
 import csv
 import pandas as pd
+# -*- coding: utf-8 -*-
 
 # 1 Lecture du fichier CSV
 
@@ -172,7 +173,7 @@ def langue_filtre(df_genre):
         if choix_langue == "0":
             return None
         elif choix_langue in langues:
-            code_langue, nom_langue = langues[choix_langue]
+            code_langue = langues[choix_langue]
         elif choix_langue == "8":
             code_langue = input("Entrez le code de la langue (ex: ko, ru, pt...) : ").strip().lower()
         else:
